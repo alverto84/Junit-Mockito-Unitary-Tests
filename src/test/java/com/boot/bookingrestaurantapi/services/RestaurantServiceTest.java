@@ -17,8 +17,11 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.Assert.*;
 
 public class RestaurantServiceTest {
 
@@ -32,8 +35,6 @@ public class RestaurantServiceTest {
     private static final List<Turn> TURN_LIST = new ArrayList<>();
     private static final List<Board> BOARD_LIST= new ArrayList<>();
     private static final List<Reservation> RESERVATION_LIST= new ArrayList<>();
-
-
 
 
     @Mock
@@ -59,11 +60,24 @@ public class RestaurantServiceTest {
 
     @Test
     public void getRestaurantByIdTest() throws BookingException {
-
         Mockito.when(restaurantRepository.findById(RESTAURANT_ID)).thenReturn(Optional.of(RESTAURANT));
-
         restaurantService.getRestaurantById(RESTAURANT_ID);
-
     }
 
+    @Test(expected = BookingException.class)
+    public void getRestaurantByIdTestError() throws BookingException {
+        Mockito.when(restaurantRepository.findById(RESTAURANT_ID)).thenReturn(Optional.empty());
+        restaurantService.getRestaurantById(RESTAURANT_ID);
+        fail();
+    }
+
+    @Test
+    public void getRestaurantsTest() throws BookingException {
+        final Restaurant restaurant = new Restaurant();
+        Mockito.when(restaurantRepository.findAll()).thenReturn(Arrays.asList(restaurant));
+        final List<RestaurantRest> response = restaurantService.getRestaurants();
+        assertNotNull(response);
+        assertFalse(response.isEmpty());
+        assertEquals(response.size(), 1);
+    }
 }
